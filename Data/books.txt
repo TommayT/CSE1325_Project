@@ -1,0 +1,3 @@
+B001,Test Book,Test Author,true
+B002,OOP Concepts,James Gosling,true
+B003,Effective Java,Joshua Bloch,false
