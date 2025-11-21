@@ -7,8 +7,34 @@ import Java.io.BufferedWriter;
 import Java.io.IOException;//forgot they have to be out of the public class
 
 public class Main {
-public static void DisplayAvailable(){//displays all non checked out books(for admin and students)
-//To do:loop to display all books in the available file
+
+public static void DisplayAvailable() {
+    String fileName = "books.txt";
+
+    System.out.println("Available Books:");
+    System.out.println("---------------------------------");
+
+    try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+        String line;
+
+        while ((line = br.readLine()) != null) {
+            String[] parts = line.split(",");
+
+            if (parts.length == 4) {
+                String id = parts[0].trim();
+                String title = parts[1].trim();
+                String author = parts[2].trim();
+                boolean available = Boolean.parseBoolean(parts[3].trim());
+
+                if (available) {
+                    System.out.println(id + " | " + title + " by " + author);
+                }
+            }
+        }
+
+    } catch (IOException e) {
+        System.out.println("Error reading file: " + e.getMessage());
+    }
 }
 
 public static void Checkout(Scanner input){//checks out a book and adds it to the checked out book list/file(preferably a file) with the student's name and due date to return
