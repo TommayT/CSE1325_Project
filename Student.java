@@ -11,6 +11,12 @@ public class Student extends User {
         int choice = 0;
         System.out.println("Welcome " + getName());
         
+        // Show current checkout status
+        String currentBook = FileUtils.getCurrentlyCheckedOutBook(getName());
+        if (currentBook != null) {
+            System.out.println("You currently have checked out: " + currentBook);
+        }
+        
         while(choice != 4) {
             System.out.println("\nWhat would you like to do:");
             System.out.println("1. Display available books");
@@ -26,16 +32,14 @@ public class Student extends User {
                     library.displayAvailableBooks();
                     break;
                 case 2:
-                    System.out.println("Enter book to checkout (title):");
+                    System.out.println("Enter book to checkout (title or ID):");
                     String checkoutTitle = input.nextLine();
-                    System.out.println("Enter due date (e.g. 2025-12-01):");
-                    String dueDate = input.nextLine();
-                    library.checkoutBook(checkoutTitle, getName(), dueDate);
+                    library.checkoutBook(checkoutTitle, getName());
                     break;
                 case 3:
                     System.out.println("Enter book to return (title):");
                     String returnTitle = input.nextLine();
-                    library.returnBook(returnTitle);
+                    library.returnBook(returnTitle, getName());
                     break;
                 case 4:
                     System.out.println("Exiting...");

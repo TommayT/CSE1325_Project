@@ -16,9 +16,24 @@ public class Library {
         FileUtils.saveBooks(books);
     }
 
-    public boolean checkoutBook(String title, String studentName, String dueDate) {
+    public boolean checkoutBook(String identifier, String studentName) {
+        // Check if student already has a book checked out
+        if (FileUtils.studentHasActiveCheckout(studentName)) {
+            System.out.println("You already have a book checked out!");
+            System.out.println("Please return it before checking out another book.");
+            return false;
+        }
+        
+        // Calculate due date (1 week from now)
+        java.util.Calendar calendar = java.util.Calendar.getInstance();
+        calendar.add(java.util.Calendar.DAY_OF_YEAR, 7);
+        String dueDate = new java.text.SimpleDateFormat("yyyy-MM-dd").format(calendar.getTime());
+        
         for (Book book : books) {
-            if (book.getTitle().equalsIgnoreCase(title.trim())) {
+            // Check by title OR ID
+            if (book.getTitle().equalsIgnoreCase(identifier.trim()) || 
+                book.getId().equalsIgnoreCase(identifier.trim())) {
+                
                 if (!book.isAvailable()) {
                     System.out.println("That book is already checked out.");
                     return false;
@@ -27,13 +42,12 @@ public class Library {
                 book.setAvailable(false);
                 FileUtils.saveBooks(books);
                 
-                Transaction transaction = new Transaction(book, studentName, 
-                    new java.text.SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date()), 
-                    dueDate);
+                String currentDate = new java.text.SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date());
+                Transaction transaction = new Transaction(book, studentName, currentDate, dueDate, false);
                 FileUtils.appendTransaction(transaction.toString());
                 
-                System.out.println("Book checked out successfully to " + studentName + 
-                                   " with due date " + dueDate + ".");
+                System.out.println("Book checked out successfully to " + studentName);
+                System.out.println("Due date: " + dueDate + " (7 days from today)");
                 return true;
             }
         }
@@ -41,7 +55,7 @@ public class Library {
         return false;
     }
 
-    public boolean returnBook(String title) {
+    public boolean returnBook(String title, String studentName) {
         for (Book book : books) {
             if (book.getTitle().equalsIgnoreCase(title.trim())) {
                 if (book.isAvailable()) {
@@ -51,6 +65,10 @@ public class Library {
                 
                 book.setAvailable(true);
                 FileUtils.saveBooks(books);
+                
+                // Mark the transaction as returned
+                FileUtils.markTransactionReturned(book.getId(), studentName);
+                
                 System.out.println("Book returned successfully.");
                 return true;
             }
@@ -65,12 +83,35 @@ public class Library {
         for (Book book : books) {
             if (book.isAvailable()) {
                 System.out.println(book.getTitle() + " by " + book.getAuthor() + 
-                                   " (" + book.getYear() + ")");
+                                   " (" + book.getYear() + "), BookID: " + book.getId());
                 found = true;
             }
         }
         if (!found) {
             System.out.println("No available books.");
+        }
+    }
+
+    public void displayCurrentlyCheckedOut() {
+        System.out.println("\n=== Currently Checked Out Books ===");
+        boolean foundAny = false;
+        
+        for (Book book : books) {
+            if (!book.isAvailable()) {
+                // Find the most recent transaction for this book
+                String studentName = FileUtils.getStudentWithBook(book.getId());
+                String dueDate = FileUtils.getDueDateForBook(book.getId());
+                
+                System.out.println("Book: " + book.getTitle() + " by " + book.getAuthor());
+                System.out.println("  Checked out by: " + studentName);
+                System.out.println("  Due date: " + dueDate);
+                System.out.println();
+                foundAny = true;
+            }
+        }
+        
+        if (!foundAny) {
+            System.out.println("No books currently checked out.");
         }
     }
 

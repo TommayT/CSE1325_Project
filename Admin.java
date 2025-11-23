@@ -1,11 +1,10 @@
 import java.util.Scanner;
 
 public class Admin extends User {
-    
     public Admin(String id, String name) {
         super(id, name);
     }
-
+    
     @Override
     public void displayMenu(Library library, Scanner input) {
         int choice = 0;
@@ -14,10 +13,10 @@ public class Admin extends User {
         while(choice != 6) {
             System.out.println("\nWhat would you like to do:");
             System.out.println("1. Add a book");
-            System.out.println("2. Check due date of checked out book");
+            System.out.println("2. View all past transactions");
             System.out.println("3. Remove book from availability");
             System.out.println("4. Display available books");
-            System.out.println("5. Display checked out books");
+            System.out.println("5. Display currently checked out books");
             System.out.println("6. Exit");
             
             choice = input.nextInt();
@@ -37,10 +36,10 @@ public class Admin extends User {
                     System.out.println("Book added successfully.");
                     break;
                 case 2:
-                    FileUtils.displayTransactions();
+                    FileUtils.displayAllTransactions();
                     break;
                 case 3:
-                    System.out.println("Enter book to remove (title):");
+                    System.out.println("Enter book to remove (title or ID):");
                     String removeTitle = input.nextLine();
                     library.removeBook(removeTitle);
                     break;
@@ -48,7 +47,7 @@ public class Admin extends User {
                     library.displayAvailableBooks();
                     break;
                 case 5:
-                    FileUtils.displayCheckedOutBooks();
+                    library.displayCurrentlyCheckedOut();
                     break;
                 case 6:
                     System.out.println("Exiting...");
